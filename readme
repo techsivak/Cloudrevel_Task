@@ -1,0 +1,43 @@
+EMI Processing - Task Completion Documentation
+Overview
+This document outlines the successful completion of the EMI Processing task as per the technical round requirements provided.
+
+Task Details
+The following tasks were completed:
+
+1. Database Setup
+Created the loan_details table using Laravel migrations with the following columns:
+
+clientid: Client identifier.
+num_of_payment: Total number of EMI payments.
+first_payment_date: Start date of the first EMI payment.
+last_payment_date: End date of the last EMI payment.
+loan_amount: Total loan amount to be paid by the client.
+Added data to the loan_details table using database seeds with the following sample data:
+
+clientid: 1001, num_of_payment: 12, loan_amount: 1550.00, etc.
+2. User Authentication Setup
+Created a user table for authentication with a user having the following credentials:
+
+username: developer
+password: Test@Password123#
+Implemented basic Laravel authentication for login functionality.
+
+3. EMI Table Creation
+Implemented the Process Data button on the admin page.
+Upon clicking the button, the following steps were executed:
+Dynamically created the emi_details table using RAW SQL queries (not Laravel query builder). The columns were generated based on the minimum first_payment_date and maximum last_payment_date from all records in the loan_details table.
+If the emi_details table already existed, it was dropped and recreated.
+4. EMI Calculation and Population
+For each loan in the loan_details table:
+The EMI amount was calculated as loan_amount / num_of_payment.
+The EMI values were distributed across months from the first_payment_date to the last_payment_date.
+The EMI values were inserted into the dynamically generated emi_details table.
+Adjustments were made in the final month to ensure the total EMI matched the loan amount exactly.
+5. Displaying EMI Data
+Displayed the EMI details from the emi_details table on the admin page after the EMI calculation.
+Ensured that the EMI amounts were correctly populated for each client, with all months covered between the first_payment_date and last_payment_date.
+6. Reprocessing EMI Data
+Implemented the feature where the Process Data button can be clicked multiple times, recalculating the EMI and regenerating the emi_details table based on any changes in the loan_details table.
+Conclusion
+The technical task was successfully completed following the requirements and guidelines provided. The EMI processing system works as expected, with dynamic table creation, accurate EMI calculations, and proper data storage.
