@@ -21,8 +21,6 @@ class EMIController extends Controller
         $this->emiService = $emiService;
         $this->loanRepository = $loanRepository;
     }
-
- 
     public function show()
     {
         $emiDetails = [];
@@ -54,50 +52,50 @@ class EMIController extends Controller
     }
 
 
-    private function generateEMITableSQL()
-    {
-        $minDate = LoanDetail::min('first_payment_date');
-        $maxDate = LoanDetail::max('last_payment_date');
+    // private function generateEMITableSQL()
+    // {
+    //     $minDate = LoanDetail::min('first_payment_date');
+    //     $maxDate = LoanDetail::max('last_payment_date');
 
-        $columns = ["clientid INT"];
+    //     $columns = ["clientid INT"];
 
-        $currentDate = \Carbon\Carbon::parse($minDate);
-        $endDate = \Carbon\Carbon::parse($maxDate);
+    //     $currentDate = \Carbon\Carbon::parse($minDate);
+    //     $endDate = \Carbon\Carbon::parse($maxDate);
 
-        while ($currentDate <= $endDate) {
-            $columns[] = "{$currentDate->format('Y_M')} DECIMAL(10, 2) DEFAULT 0";
-            $currentDate->addMonth();
-        }
+    //     while ($currentDate <= $endDate) {
+    //         $columns[] = "{$currentDate->format('Y_M')} DECIMAL(10, 2) DEFAULT 0";
+    //         $currentDate->addMonth();
+    //     }
 
-        $columnsSQL = implode(", ", $columns);
-        return "CREATE TABLE emi_details ($columnsSQL)";
-    }
+    //     $columnsSQL = implode(", ", $columns);
+    //     return "CREATE TABLE emi_details ($columnsSQL)";
+    // }
 
-    private function populateEMITable()
-    {
-        $loans = LoanDetail::all();
+    // private function populateEMITable()
+    // {
+    //     $loans = LoanDetail::all();
     
-        foreach ($loans as $loan) {
-            $emiAmount = round($loan->loan_amount / $loan->num_of_payment, 2);
-            $date = \Carbon\Carbon::parse($loan->first_payment_date);
-            $endDate = \Carbon\Carbon::parse($loan->last_payment_date);
-            $values = ["clientid" => $loan->clientid];
-            $accumulatedEMI = 0;
+    //     foreach ($loans as $loan) {
+    //         $emiAmount = round($loan->loan_amount / $loan->num_of_payment, 2);
+    //         $date = \Carbon\Carbon::parse($loan->first_payment_date);
+    //         $endDate = \Carbon\Carbon::parse($loan->last_payment_date);
+    //         $values = ["clientid" => $loan->clientid];
+    //         $accumulatedEMI = 0;
     
-            while ($date <= $endDate) {
-                $monthColumn = $date->format('Y_M');
+    //         while ($date <= $endDate) {
+    //             $monthColumn = $date->format('Y_M');
                 
-                if ($date->equalTo($endDate)) { 
-                    $values[$monthColumn] = round($loan->loan_amount - $accumulatedEMI, 2);
-                } else {
-                    $values[$monthColumn] = $emiAmount;
-                    $accumulatedEMI += $emiAmount;
-                }
+    //             if ($date->equalTo($endDate)) { 
+    //                 $values[$monthColumn] = round($loan->loan_amount - $accumulatedEMI, 2);
+    //             } else {
+    //                 $values[$monthColumn] = $emiAmount;
+    //                 $accumulatedEMI += $emiAmount;
+    //             }
     
-                $date->addMonth();
-            }
+    //             $date->addMonth();
+    //         }
     
-            DB::table('emi_details')->insert($values);
-        }
-    }
+    //         DB::table('emi_details')->insert($values);
+    //     }
+    // }
 }
